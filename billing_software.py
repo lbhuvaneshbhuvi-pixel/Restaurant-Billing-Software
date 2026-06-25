@@ -20,7 +20,7 @@ def setup_database():
         conn = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bhuvi',
             database='billing_system'
         )
         cursor = conn.cursor()
@@ -125,7 +125,7 @@ def create_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='root',  # Replace with your MySQL password
+            password='bhuvi',  # MySQL password
             database='billing_system'
         )
         if connection.is_connected():
@@ -140,60 +140,165 @@ def close_connection(connection):
         connection.close()
         print('MySQL connection is closed')
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PREMIUM ADMIN LOGIN WINDOW  ─  Dark glassmorphism theme
+# ─────────────────────────────────────────────────────────────────────────────
 class AdminLoginWindow:
+    # Colour palette
+    BG          = "#0d0f1a"   # deep navy background
+    CARD_BG     = "#1a1d2e"   # card surface
+    CARD_BORDER = "#2a2d3e"   # card border
+    ACCENT      = "#7c3aed"   # violet accent
+    ACCENT_HOV  = "#6d28d9"   # hover shade
+    ACCENT2     = "#06b6d4"   # cyan highlight
+    FG_MAIN     = "#f1f5f9"   # primary text
+    FG_MUTED    = "#94a3b8"   # secondary text
+    INPUT_BG    = "#0f1120"   # input background
+    SUCCESS     = "#10b981"   # green
+    ERROR       = "#ef4444"   # red
+
     def __init__(self, root):
         self.root = root
-        self.root.title("Admin Login")
-        self.root.geometry("1980x1080")  # Adjusted for better visibility
-        self.root.configure(bg="#e0f7fa")  # Light cyan background color
+        self.root.title("Malabar Family Restaurant – Admin Portal")
+        self.root.geometry("1280x800")
+        self.root.resizable(True, True)
+        self.root.configure(bg=self.BG)
 
-        # Title Label
-        self.title_label = Label(self.root, text="Malabar Family Restaurant", bg="#e0f7fa", font=("Arial", 24, 'bold'), fg="#00796b")
-        self.title_label.pack(pady=20)
-
-        # Load and display an image
-         # Load and display an image
-        self.load_image("img/logo.jpg") # Update with your image path
-
-        # Username and Password
         self.username = StringVar()
         self.password = StringVar()
+        self._build_ui()
 
-        # Create a frame for the login form
-        frame = Frame(self.root, bg="#ffffff", padx=20, pady=20, relief=RAISED, bd=2)
-        frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        # ── Left decorative panel ──────────────────────────────────────
+        left = Frame(self.root, bg="#12152b", width=560)
+        left.pack(side=LEFT, fill=Y)
+        left.pack_propagate(False)
 
-        # Username and Password Fields
-        Label(frame, text="Admin Username", bg="#ffffff", font=("Arial", 14, 'bold')).pack(pady=10)
-        Entry(frame, textvariable=self.username, font=("Arial", 12), bd=2, relief=SUNKEN).pack(pady=5)
-        Label(frame, text="Admin Password", bg="#ffffff", font=("Arial", 14, 'bold')).pack(pady=10)
-        Entry(frame, textvariable=self.password, show='*', font=("Arial", 12), bd=2, relief=SUNKEN).pack(pady=5)
+        # Brand block inside left panel
+        brand_wrap = Frame(left, bg="#12152b")
+        brand_wrap.place(relx=0.5, rely=0.42, anchor=CENTER)
 
-        # Buttons
-        login_button = Button(frame, text="Login", command=self.login, bg="#00796b", fg="white", font=("Arial", 12, 'bold'), bd=0)
-        login_button.pack(pady=20)
-        login_button.bind("<Enter>", lambda e: login_button.config(bg="#005f51"))  # Hover effect
-        login_button.bind("<Leave>", lambda e: login_button.config(bg="#00796b"))  # Reset effect
+        # Coloured accent bar
+        Frame(brand_wrap, bg=self.ACCENT, height=4, width=60).pack(anchor=W, pady=(0, 12))
 
+        Label(brand_wrap, text="MALABAR",
+              font=("Helvetica", 36, "bold"), bg="#12152b",
+              fg=self.FG_MAIN).pack(anchor=W)
+        Label(brand_wrap, text="Family Restaurant",
+              font=("Helvetica", 18), bg="#12152b",
+              fg=self.ACCENT2).pack(anchor=W)
+
+        Frame(brand_wrap, bg=self.CARD_BORDER, height=1, width=280).pack(anchor=W, pady=18)
+
+        Label(brand_wrap, text="Admin Control Panel",
+              font=("Helvetica", 12), bg="#12152b",
+              fg=self.FG_MUTED).pack(anchor=W)
+        Label(brand_wrap,
+              text="Manage roles, billing & kitchen operations",
+              font=("Helvetica", 10), bg="#12152b",
+              fg="#475569", wraplength=320, justify=LEFT).pack(anchor=W, pady=4)
+
+        # Footer note
+        Label(left, text="© 2025 Malabar Restaurant. All rights reserved.",
+              font=("Helvetica", 8), bg="#12152b",
+              fg="#334155").place(relx=0.5, rely=0.97, anchor=CENTER)
+
+        # ── Right login card ───────────────────────────────────────────
+        right = Frame(self.root, bg=self.BG)
+        right.pack(side=RIGHT, fill=BOTH, expand=True)
+
+        card = Frame(right, bg=self.CARD_BG,
+                     highlightbackground=self.CARD_BORDER,
+                     highlightthickness=1, padx=50, pady=50)
+        card.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        # Card header
+        Label(card, text="Welcome back",
+              font=("Helvetica", 22, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MAIN).pack(anchor=W)
+        Label(card, text="Sign in to your admin account",
+              font=("Helvetica", 11),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W, pady=(4, 24))
+
+        # Username field
+        Label(card, text="USERNAME",
+              font=("Helvetica", 9, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W)
+        self._entry(card, self.username, False).pack(fill=X, pady=(4, 16))
+
+        # Password field
+        Label(card, text="PASSWORD",
+              font=("Helvetica", 9, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W)
+        self._entry(card, self.password, True).pack(fill=X, pady=(4, 28))
+
+        # Login button
+        btn = Button(card, text="Sign In  →",
+                     command=self.login,
+                     bg=self.ACCENT, fg="white",
+                     font=("Helvetica", 12, "bold"),
+                     relief=FLAT, cursor="hand2",
+                     padx=20, pady=10, width=26)
+        btn.pack(fill=X)
+        btn.bind("<Enter>", lambda e: btn.config(bg=self.ACCENT_HOV))
+        btn.bind("<Leave>", lambda e: btn.config(bg=self.ACCENT))
+
+        # Status label (shows errors inline)
+        self.status_lbl = Label(card, text="",
+                                font=("Helvetica", 10),
+                                bg=self.CARD_BG, fg=self.ERROR)
+        self.status_lbl.pack(pady=(12, 0))
+
+        # Divider + hint
+        Frame(card, bg=self.CARD_BORDER, height=1, width=320).pack(pady=20)
+        Label(card,
+              text="Default credentials: admin / admin123",
+              font=("Helvetica", 9),
+              bg=self.CARD_BG, fg="#334155").pack()
+
+    # ------------------------------------------------------------------
+    def _entry(self, parent, var, is_pass):
+        """Create a styled dark entry widget."""
+        e = Entry(parent, textvariable=var,
+                  show="●" if is_pass else "",
+                  font=("Helvetica", 13),
+                  bg=self.INPUT_BG, fg=self.FG_MAIN,
+                  insertbackground=self.ACCENT2,
+                  relief=FLAT,
+                  highlightbackground=self.CARD_BORDER,
+                  highlightthickness=1,
+                  width=30)
+        if is_pass:
+            e.bind("<Return>", lambda ev: self.login())
+        return e
+
+    # ------------------------------------------------------------------
     def load_image(self, path):
         try:
             img = Image.open(path)
-            img = img.resize((200, 200), Image.ANTIALIAS)  # Resize image
+            img = img.resize((200, 200), Image.LANCZOS)
             photo = ImageTk.PhotoImage(img)
-            label = Label(self.root, image=photo, bg="#e0f7fa")
-            label.image = photo  # Keep a reference
-            label.place(x=300, y=100)  # Position the image
+            label = Label(self.root, image=photo, bg=self.BG)
+            label.image = photo
+            label.place(x=300, y=100)
         except Exception:
-            # Simply do nothing if the image fails to load
             pass
 
+    # ------------------------------------------------------------------
     def login(self):
-        username = self.username.get()
+        username = self.username.get().strip()
         password = self.password.get()
+        self.status_lbl.config(text="Authenticating…", fg=self.ACCENT2)
+        self.root.update()
+
+        if not username or not password:
+            self.status_lbl.config(text="⚠  Username and password are required.", fg=self.ERROR)
+            return
 
         conn = create_connection()
         if conn is None:
-            messagebox.showerror("Error", "Could not connect to the database.")
+            self.status_lbl.config(text="⚠  Database connection failed.", fg=self.ERROR)
             return
 
         try:
@@ -202,61 +307,139 @@ class AdminLoginWindow:
             result = cursor.fetchone()
 
             if result and bcrypt.checkpw(password.encode('utf-8'), result[0].encode('utf-8')):
-                messagebox.showinfo("Success", "Logged in as Admin")
-                self.show_role_login_signup()  # Open the unified role login/signup window
-                self.root.withdraw()  # This hides the main window
+                self.status_lbl.config(text="✔  Login successful!", fg=self.SUCCESS)
+                self.root.after(400, lambda: [
+                    self.show_role_login_signup(),
+                    self.root.withdraw()
+                ])
             else:
-                messagebox.showerror("Error", "Invalid credentials")
+                self.status_lbl.config(text="✘  Invalid username or password.", fg=self.ERROR)
         except mysql.connector.Error as err:
-            messagebox.showerror("Error", f"Database error: {err}")
+            self.status_lbl.config(text=f"DB Error: {err}", fg=self.ERROR)
         finally:
             cursor.close()
             close_connection(conn)
 
+    # ------------------------------------------------------------------
     def show_role_login_signup(self):
-        role_selection_window = Toplevel(self.root)
-        role_selection_window.title("Role Login / Sign Up")
-        role_selection_window.geometry("1980x1080")
-        role_selection_window.configure(bg="#e0f7fa")
+        """Premium role selection / sign-up window."""
+        win = Toplevel(self.root)
+        win.title("Role Access – Malabar Restaurant")
+        win.geometry("900x620")
+        win.configure(bg=self.BG)
+        win.resizable(False, False)
+        self._staff_portal_win = win  # Keep reference for back_to_home navigation
 
-        self.role = StringVar()
+        self.role     = StringVar(value="billing")
         self.username = StringVar()
         self.password = StringVar()
-        self.action = StringVar(value="Login")  # Default action is Login
 
-        # Role Selection
-        Label(role_selection_window, text="Select Role", bg="#e0f7fa", font=("Arial", 16, 'bold')).pack(pady=20)
+        # ── Header strip ──────────────────────────────────────────────
+        hdr = Frame(win, bg="#12152b", height=70)
+        hdr.pack(fill=X)
+        Label(hdr, text="Malabar Restaurant  ›  Staff Portal",
+              font=("Helvetica", 14, "bold"),
+              bg="#12152b", fg=self.FG_MAIN).place(x=30, rely=0.5, anchor=W)
+
+        # ── Role selector row ─────────────────────────────────────────
+        role_strip = Frame(win, bg=self.BG, pady=18)
+        role_strip.pack(fill=X)
+        Label(role_strip, text="Select Your Role",
+              font=("Helvetica", 11, "bold"),
+              bg=self.BG, fg=self.FG_MUTED).pack(side=LEFT, padx=30)
+
         roles = ["billing", "kitchen", "executive"]
-        self.role_combobox = ttk.Combobox(role_selection_window, textvariable=self.role, values=roles, state="readonly")
-        self.role_combobox.pack(pady=10)
-        self.role_combobox.current(0)  # Set default role
+        role_colors = {"billing": "#7c3aed", "kitchen": "#f59e0b", "executive": "#06b6d4"}
+        self._role_btns = {}
+        for r in roles:
+            b = Button(role_strip, text=r.upper(),
+                       font=("Helvetica", 10, "bold"),
+                       bg=role_colors[r] if r == "billing" else self.CARD_BG,
+                       fg="white",
+                       relief=FLAT, padx=18, pady=8, cursor="hand2",
+                       command=lambda rv=r: self._select_role(rv, role_colors))
+            b.pack(side=LEFT, padx=6)
+            self._role_btns[r] = b
+        self._role_colors = role_colors
 
-        # Username and Password Fields
-        Label(role_selection_window, text="Username", bg="#e0f7fa", font=("Arial", 14)).pack(pady=10)
-        Entry(role_selection_window, textvariable=self.username, bd=2, relief=SUNKEN).pack(pady=5)
-        Label(role_selection_window, text="Password", bg="#e0f7fa", font=("Arial", 14)).pack(pady=10)
-        Entry(role_selection_window, textvariable=self.password, show='*', bd=2, relief=SUNKEN).pack(pady=5)
+        # ── Login card ────────────────────────────────────────────────
+        card = Frame(win, bg=self.CARD_BG,
+                     highlightbackground=self.CARD_BORDER,
+                     highlightthickness=1, padx=60, pady=40)
+        card.place(relx=0.5, rely=0.58, anchor=CENTER)
 
-        # Action Buttons
-        login_button = Button(role_selection_window, text="Login", command=self.role_login, bg="#00796b", fg="white", font=("Arial", 12, 'bold'), bd=0)
-        login_button.pack(pady=10)
-        login_button.bind("<Enter>", lambda e: login_button.config(bg="#005f51"))  # Hover effect
-        login_button.bind("<Leave>", lambda e: login_button.config(bg="#00796b"))  # Reset effect
+        Label(card, text="Staff Login / Sign Up",
+              font=("Helvetica", 18, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MAIN).pack(anchor=W)
+        Label(card, text="Enter your credentials for your assigned role",
+              font=("Helvetica", 10),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W, pady=(4, 22))
 
-        signup_button = Button(role_selection_window, text="Sign Up", command=self.role_signup, bg="#00796b", fg="white", font=("Arial", 12, 'bold'), bd=0)
-        signup_button.pack(pady=10)
-        signup_button.bind("<Enter>", lambda e: signup_button.config(bg="#005f51"))  # Hover effect
-        signup_button.bind("<Leave>", lambda e: signup_button.config(bg="#00796b"))  # Reset effect
+        Label(card, text="USERNAME",
+              font=("Helvetica", 9, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W)
+        self._entry(card, self.username, False).pack(fill=X, pady=(4, 14))
 
-        # Back to Admin Button
-        back_button = Button(role_selection_window, text="Back to Admin", command=lambda: self.back_to_admin(role_selection_window), bg="#d32f2f", fg="white", font=("Arial", 12, 'bold'), bd=0)
-        back_button.pack(pady=10)
-        back_button.bind("<Enter>", lambda e: back_button.config(bg="#b71c1c"))  # Hover effect
-        back_button.bind("<Leave>", lambda e: back_button.config(bg="#d32f2f"))  # Reset effect
+        Label(card, text="PASSWORD",
+              font=("Helvetica", 9, "bold"),
+              bg=self.CARD_BG, fg=self.FG_MUTED).pack(anchor=W)
+        self._entry(card, self.password, True).pack(fill=X, pady=(4, 24))
 
+        btn_row = Frame(card, bg=self.CARD_BG)
+        btn_row.pack(fill=X)
+
+        def _styled_btn(parent, text, cmd, color):
+            b = Button(parent, text=text, command=cmd,
+                       bg=color, fg="white",
+                       font=("Helvetica", 11, "bold"),
+                       relief=FLAT, padx=16, pady=9, cursor="hand2")
+            b.pack(side=LEFT, expand=True, fill=X, padx=(0, 6))
+            hov = self._darken(color)
+            b.bind("<Enter>", lambda e: b.config(bg=hov))
+            b.bind("<Leave>", lambda e: b.config(bg=color))
+            return b
+
+        _styled_btn(btn_row, "Login",   self.role_login,  self.ACCENT)
+        _styled_btn(btn_row, "Sign Up", self.role_signup, self.SUCCESS)
+
+        self.role_status = Label(card, text="",
+                                 font=("Helvetica", 10),
+                                 bg=self.CARD_BG, fg=self.ERROR)
+        self.role_status.pack(pady=(12, 0))
+
+        # Back button
+        back = Button(win, text="← Back to Admin Login",
+                      command=lambda: self.back_to_admin(win),
+                      bg=self.BG, fg=self.FG_MUTED,
+                      font=("Helvetica", 10),
+                      relief=FLAT, cursor="hand2")
+        back.place(x=20, y=580)
+        back.bind("<Enter>", lambda e: back.config(fg=self.FG_MAIN))
+        back.bind("<Leave>", lambda e: back.config(fg=self.FG_MUTED))
+
+    # ------------------------------------------------------------------
+    def _select_role(self, role, colors):
+        self.role.set(role)
+        for r, b in self._role_btns.items():
+            b.config(bg=colors[r] if r == role else self.CARD_BG)
+
+    @staticmethod
+    def _darken(hex_color):
+        """Return a slightly darker shade of the given hex colour."""
+        try:
+            r = int(hex_color[1:3], 16)
+            g = int(hex_color[3:5], 16)
+            b = int(hex_color[5:7], 16)
+            factor = 0.80
+            return "#{:02x}{:02x}{:02x}".format(
+                int(r*factor), int(g*factor), int(b*factor))
+        except Exception:
+            return hex_color
+
+    # ------------------------------------------------------------------
     def back_to_admin(self, role_selection_window):
-        role_selection_window.destroy()  # Close the role selection window
-        self.root.deiconify()  # Show the admin login window again
+        role_selection_window.destroy()
+        self.root.deiconify()
 
     def role_login(self):
         role = self.role.get()
@@ -275,13 +458,15 @@ class AdminLoginWindow:
 
             if result and bcrypt.checkpw(password.encode('utf-8'), result[0].encode('utf-8')):
                 messagebox.showinfo("Success", f"Logged in as {role.capitalize()}")
+                # Find the staff portal window (the Toplevel that called role_login)
+                staff_portal_win = self._staff_portal_win
                 # Open the respective application based on the role
                 if role == "billing":
-                    self.open_billing_app()
+                    self.open_billing_app(staff_portal_win)
                 elif role == "kitchen":
-                    self.open_kitchen_app()
+                    self.open_kitchen_app(staff_portal_win)
                 elif role == "executive":
-                    self.open_executive_app()
+                    self.open_executive_app(staff_portal_win)
             else:
                 messagebox.showerror("Error", "Invalid credentials")
         except mysql.connector.Error as err:
@@ -315,17 +500,20 @@ class AdminLoginWindow:
             cursor.close()
             close_connection(conn)
 
-    def open_billing_app(self):
+    def open_billing_app(self, staff_portal_win):
+        staff_portal_win.withdraw()  # Hide the staff portal
         billing_window = Toplevel(self.root)
-        Bill_App(billing_window)  # Assuming Bill_App is the class for the billing application
+        Bill_App(billing_window, staff_portal_win)  # Pass staff portal reference
 
-    def open_kitchen_app(self):
+    def open_kitchen_app(self, staff_portal_win):
+        staff_portal_win.withdraw()  # Hide the staff portal
         kitchen_window = Toplevel(self.root)
-        KitchenApp(kitchen_window)  # Assuming KitchenApp is the class for the kitchen application
+        KitchenApp(kitchen_window, staff_portal_win)  # Pass staff portal reference
 
-    def open_executive_app(self):
+    def open_executive_app(self, staff_portal_win):
+        staff_portal_win.withdraw()  # Hide the staff portal
         executive_window = Toplevel(self.root)
-        ExecutiveApp(executive_window)  # Assuming ExecutiveApp is the class for the executive application
+        ExecutiveApp(executive_window, staff_portal_win)  # Pass staff portal reference
 
 
 class AdminSignupWindow:
@@ -372,8 +560,9 @@ class AdminSignupWindow:
 
 
 class Bill_App:
-    def __init__(self, root):
+    def __init__(self, root, staff_portal_win=None):
         self.root = root
+        self.staff_portal_win = staff_portal_win  # Reference to staff portal window
         self.root.geometry("1980x1080")
         self.root.title("Malabar Family Restaurant")
         self.input_value = True
@@ -509,16 +698,38 @@ class Bill_App:
         self.load_image("img/briyani.jpg", (600, 350), 0, 0, MiddleFrame)  # Changed width to 600
         self.load_image("img/restaurant.jpg", (600, 300), 490, 0, MiddleFrame)  # Changed width to 500
 
-        # RightLabelFrame Bill Area
-        RightFrame = LabelFrame(Main_Frame, text="Bill Area", bd=2, bg='white', font=('arial', 16, 'bold'), fg="red")
+        # ── Premium Bill Receipt Area ────────────────────────────────
+        RightFrame = Frame(Main_Frame, bg="#0d0f1a",
+                           highlightbackground="#7c3aed",
+                           highlightthickness=2)
         RightFrame.place(x=870, y=140, width=480, height=260)
-        bill_title = Label(RightFrame, text="Bill Receipt", fg="blue", bg="white", font="arial 16 bold", bd=7, relief=GROOVE).pack(fill=X)
 
-        scroll_y = Scrollbar(RightFrame, orient=VERTICAL)
-        self.textarea = Text(RightFrame, yscrollcommand=scroll_y.set, bg="white", fg='blue', font=('arial', 12, 'bold'))
+        # Header bar
+        bill_hdr = Frame(RightFrame, bg="#7c3aed", height=32)
+        bill_hdr.pack(fill=X)
+        bill_hdr.pack_propagate(False)
+        Label(bill_hdr, text="  🧾  BILL RECEIPT",
+              font=("Courier", 11, "bold"),
+              bg="#7c3aed", fg="white").pack(side=LEFT, padx=6, pady=4)
+
+        scroll_y = Scrollbar(RightFrame, orient=VERTICAL,
+                             troughcolor="#1a1d2e", bg="#2a2d3e")
+        self.textarea = Text(RightFrame,
+                             yscrollcommand=scroll_y.set,
+                             bg="#0d0f1a", fg="#06b6d4",
+                             font=("Courier", 11),
+                             insertbackground="#7c3aed",
+                             selectbackground="#7c3aed",
+                             relief=FLAT, padx=10, pady=6)
         scroll_y.pack(side=RIGHT, fill=Y)
         scroll_y.config(command=self.textarea.yview)
         self.textarea.pack(fill=BOTH, expand=1)
+        # Tag styles for the receipt
+        self.textarea.tag_config("header",  foreground="#f1f5f9", font=("Courier", 12, "bold"))
+        self.textarea.tag_config("divider", foreground="#334155")
+        self.textarea.tag_config("label",   foreground="#94a3b8")
+        self.textarea.tag_config("value",   foreground="#06b6d4", font=("Courier", 11, "bold"))
+        self.textarea.tag_config("total",   foreground="#7c3aed", font=("Courier", 12, "bold"))
 
         self.lblCategories = Label(ProductFrame, font=('arial', 14, 'bold'), bg=self.bg_color, text="Select Item", bd=4)
         self.lblCategories.grid(row=0, column=0, sticky=W, padx=5, pady=2)
@@ -732,15 +943,21 @@ class Bill_App:
 
     def welcome(self):
         self.textarea.delete(1.0, END)
-        self.textarea.insert(END, "\t Malabar Restaurant, Erode")
-        self.textarea.insert(END, f"\n Bill Number:\t{self.search_bill.get()}")  # Ensure this line is present
-        self.textarea.insert(END, f"\n Customer Name: {self.c_name.get()}")
-        self.textarea.insert(END, f"\n Phone Number: {self.c_phon.get()}")
-        self.textarea.insert(END, f"\n Customer Email: {self.c_email.get()}")
-        
-        self.textarea.insert(END, "\n ==================================================")
-        self.textarea.insert(END, "\n Products\t\t\tQTY\t\tPrice")
-        self.textarea.insert(END, "\n ==================================================\n")
+        self.textarea.insert(END, " ╔══════════════════════════════════════╗\n", "divider")
+        self.textarea.insert(END, "   MALABAR FAMILY RESTAURANT\n", "header")
+        self.textarea.insert(END, "   Erode, Tamil Nadu\n", "label")
+        self.textarea.insert(END, " ╚══════════════════════════════════════╝\n", "divider")
+        self.textarea.insert(END, " Bill No : ", "label")
+        self.textarea.insert(END, f"{self.search_bill.get()}\n", "value")
+        self.textarea.insert(END, " Name    : ", "label")
+        self.textarea.insert(END, f"{self.c_name.get()}\n", "value")
+        self.textarea.insert(END, " Phone   : ", "label")
+        self.textarea.insert(END, f"{self.c_phon.get()}\n", "value")
+        self.textarea.insert(END, " Email   : ", "label")
+        self.textarea.insert(END, f"{self.c_email.get()}\n", "value")
+        self.textarea.insert(END, " ──────────────────────────────────────\n", "divider")
+        self.textarea.insert(END, " Item                    QTY    Price\n", "header")
+        self.textarea.insert(END, " ──────────────────────────────────────\n", "divider")
 
     def iaddItem(self):
         Tax = 2
@@ -757,16 +974,21 @@ class Bill_App:
 
     def gen_bill(self):
         if self.product.get() == "":
-            messagebox.showerror('Error', "Please Add To Cart Product") 
+            messagebox.showerror('Error', "Please Add To Cart Product")
         else:
             text = self.textarea.get(10.0, (10.0 + float(len(self.l))))
             self.welcome()  # This will include the bill number
             self.textarea.insert(END, text)
-            self.textarea.insert(END, "\n ==================================================")
-            self.textarea.insert(END, f"\n Sub Amount:\t\t\t\t{self.sub_total.get()}")
-            self.textarea.insert(END, f"\n Tax Amount:\t\t\t\t{self.tax_input.get()}")
-            self.textarea.insert(END, f"\n Total Amount:\t\t\t\t{self.total.get()}")
-            self.textarea.insert(END, "\n ==================================================\n")
+            self.textarea.insert(END, " ──────────────────────────────────────\n", "divider")
+            self.textarea.insert(END, " Sub Total : ", "label")
+            self.textarea.insert(END, f"{self.sub_total.get()}\n", "value")
+            self.textarea.insert(END, " Tax (Govt): ", "label")
+            self.textarea.insert(END, f"{self.tax_input.get()}\n", "value")
+            self.textarea.insert(END, " ══════════════════════════════════════\n", "divider")
+            self.textarea.insert(END, " TOTAL     : ", "label")
+            self.textarea.insert(END, f"{self.total.get()}\n", "total")
+            self.textarea.insert(END, " ══════════════════════════════════════\n", "divider")
+            self.textarea.insert(END, "  Thank you! Visit again 🙏\n", "header")
 
     def get_bill_data(self):
         return f"Bill Number: {self.search_bill.get()}\n" \
@@ -996,19 +1218,23 @@ class Bill_App:
             messagebox.showerror("Error", "Product not found.")
 
     def back_to_home(self):
-        # Logic to go back to the home screen or main menu
-        self.root.destroy()  # Close the current window
-        main_window = Tk()  # Create a new main window
-        LoginWindow(main_window)  # Assuming you have a LoginWindow class
-        main_window.mainloop()  # Start the main loop for the new window
+        self.root.destroy()  # Close the billing window
+        if self.staff_portal_win and self.staff_portal_win.winfo_exists():
+            self.staff_portal_win.deiconify()  # Show the staff portal again
+        else:
+            # Fallback: open a new admin login if staff portal is gone
+            main_window = Tk()
+            AdminLoginWindow(main_window)
+            main_window.mainloop()
 
 
 
 
 
 class KitchenApp:
-    def __init__(self, root):
+    def __init__(self, root, staff_portal_win=None):
         self.root = root
+        self.staff_portal_win = staff_portal_win  # Reference to staff portal window
         self.root.geometry("1980x1080")
         self.root.title("Kitchen Application")
         self.create_ui()
@@ -1137,10 +1363,14 @@ class KitchenApp:
         self.load_orders()  # Reload orders from the database
 
     def back_to_home(self):
-        self.root.destroy()
-        main_window = Tk()
-        LoginWindow(main_window)
-        main_window.mainloop()
+        self.root.destroy()  # Close the kitchen window
+        if self.staff_portal_win and self.staff_portal_win.winfo_exists():
+            self.staff_portal_win.deiconify()  # Show the staff portal again
+        else:
+            # Fallback: open a new admin login if staff portal is gone
+            main_window = Tk()
+            AdminLoginWindow(main_window)
+            main_window.mainloop()
 
     def open_stock_management(self):
         stock_window = Toplevel(self.root)
@@ -1221,8 +1451,9 @@ class KitchenApp:
 
 
 class ExecutiveApp:
-    def __init__(self, root):
+    def __init__(self, root, staff_portal_win=None):
         self.root = root
+        self.staff_portal_win = staff_portal_win  # Reference to staff portal window
         self.root.geometry("1980x1080")
         self.root.title("Executive Application")
         self.cart = []  # To hold items added to the cart
@@ -1480,10 +1711,14 @@ class ExecutiveApp:
         messagebox.showinfo("Info", "Orders refreshed!")  # Placeholder for actual logic
 
     def back_to_home(self):
-        self.root.destroy()
-        main_window = Tk()
-        LoginWindow(main_window)
-        main_window.mainloop()
+        self.root.destroy()  # Close the executive window
+        if self.staff_portal_win and self.staff_portal_win.winfo_exists():
+            self.staff_portal_win.deiconify()  # Show the staff portal again
+        else:
+            # Fallback: open a new admin login if staff portal is gone
+            main_window = Tk()
+            AdminLoginWindow(main_window)
+            main_window.mainloop()
 
     def open_manage_catalog(self):
         self.catalog_window = Toplevel(self.root)
@@ -1618,6 +1853,7 @@ class ExecutiveApp:
             messagebox.showerror("Error", "Please enter a product name.")
 
 if __name__ == "__main__":
+    setup_database()          # Ensure all tables exist before UI starts
     root = Tk()
     app = AdminLoginWindow(root)  # Start with Admin Login
-    root.mainloop() # Start the main loop for the application # Start the main loop for the application
+    root.mainloop()
